@@ -1,0 +1,97 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Default Deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isSignedIn() { return request.auth != null; }
+    
+    // Identity verification (Sync)
+    function getUserDoc() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid));
+    }
+    function isAdmin() { 
+      return isSignedIn() && 
+             exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
+             getUserDoc().data.role == 'admin'; 
+    }
+    function isStaff() { 
+      return isSignedIn() && 
+             exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
+             (getUserDoc().data.role == 'staff' || getUserDoc().data.role == 'admin'); 
+    }
+    
+    function incoming() { return request.resource.data; }
+    function existing() { return resource.data; }
+
+    // Users
+    match /users/{userId} {
+      allow read: if isSignedIn(); 
+      allow create: if isSignedIn() && (request.auth.uid == userId || isAdmin()); 
+      allow update: if isAdmin() || (isSignedIn() && request.auth.uid == userId && incoming().role == existing().role);
+      allow delete: if isAdmin();
+    }
+
+    // Inventory
+    match /inventory/{itemId} {
+      allow read: if isSignedIn();
+      allow create, update: if isAdmin() || isStaff();
+      allow delete: if isAdmin();
+    }
+
+    // Bills
+    match /bills/{billId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn();
+      allow update, delete: if isAdmin();
+    }
+
+    // Job Cards
+    match /jobCards/{cardId} {
+      allow read, write: if isSignedIn();
+    }
+
+    // Settings
+    match /settings/invoice {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    match /settings/{docId} {
+       allow read: if isSignedIn();
+       allow write: if isAdmin();
+    }
+
+    // Suppliers
+    match /suppliers/{supplierId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    // Purchases
+    match /purchases/{purchaseId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    // Expenses
+    match /expenses/{expenseId} {
+      allow read: if isSignedIn();
+      allow create, update: if isAdmin() || isStaff();
+      allow delete: if isAdmin();
+    }
+
+    // Logs
+    match /logs/{logId} {
+      allow create, read: if isSignedIn();
+    }
+
+    // Customers
+    match /customers/{customerId} {
+      allow read, write: if isSignedIn();
+    }
+  }
+}

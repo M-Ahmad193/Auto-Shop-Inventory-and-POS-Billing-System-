@@ -1,0 +1,175 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "App users (Admin / Staff)",
+      "type": "object",
+      "properties": {
+        "username": { "type": "string" },
+        "password": { "type": "string" },
+        "role": { "type": "string", "enum": ["admin", "staff"] }
+      },
+      "required": ["username", "password", "role"]
+    },
+    "InventoryItem": {
+      "title": "Inventory Item",
+      "description": "Spare parts and stock",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "costPrice": { "type": "number" },
+        "salePrice": { "type": "number" },
+        "quantity": { "type": "number" }
+      },
+      "required": ["name", "costPrice", "salePrice", "quantity"]
+    },
+    "Bill": {
+      "title": "Bill",
+      "description": "Customer bills or invoices",
+      "type": "object",
+      "properties": {
+        "billNumber": { "type": "number" },
+        "customerPhone": { "type": "string" },
+        "bikeNumber": { "type": "string" },
+        "bikeModel": { "type": "string" },
+        "currentMeter": { "type": "number" },
+        "nextMeter": { "type": "number" },
+        "serviceCharge": { "type": "number" },
+        "laborCharge": { "type": "number" },
+        "items": { "type": "array" },
+        "total": { "type": "number" },
+        "amountPaid": { "type": "number" },
+        "balance": { "type": "number" },
+        "discount": { "type": "number" },
+        "notes": { "type": "string" },
+        "profit": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["billNumber", "customerPhone", "total", "amountPaid", "balance", "discount", "createdAt"]
+    },
+    "JobCard": {
+      "title": "Job Card",
+      "description": "Active work drafts",
+      "type": "object",
+      "properties": {
+        "customerName": { "type": "string" },
+        "customerPhone": { "type": "string" },
+        "bikeNumber": { "type": "string" },
+        "bikeModel": { "type": "string" },
+        "items": { "type": "array" },
+        "serviceCharge": { "type": "number" },
+        "laborCharge": { "type": "number" },
+        "discount": { "type": "number" },
+        "notes": { "type": "string" },
+        "status": { "type": "string", "enum": ["active", "billed"] },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["customerPhone", "bikeNumber", "status", "createdAt"]
+    },
+    "Supplier": {
+      "title": "Supplier",
+      "description": "Spare parts suppliers",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "phone": { "type": "string" },
+        "notes": { "type": "string" }
+      },
+      "required": ["name"]
+    },
+    "Purchase": {
+      "title": "Purchase",
+      "description": "Stock purchases from suppliers",
+      "type": "object",
+      "properties": {
+        "supplierId": { "type": "string" },
+        "items": { "type": "array" },
+        "total": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["supplierId", "total", "createdAt"]
+    },
+    "Expense": {
+      "title": "Expense",
+      "description": "Shop expenses",
+      "type": "object",
+      "properties": {
+        "amount": { "type": "number" },
+        "description": { "type": "string" },
+        "category": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["amount", "description", "createdAt"]
+    },
+    "Customer": {
+      "title": "Customer",
+      "description": "Customer and bike records",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "phone": { "type": "string" },
+        "bikeNumber": { "type": "string" },
+        "bikeModel": { "type": "string" },
+        "totalBalance": { "type": "number" }
+      },
+      "required": ["phone", "bikeNumber"]
+    },
+    "InvoiceSettings": {
+      "title": "Invoice Settings",
+      "description": "Customizable invoice formatting",
+      "type": "object",
+      "properties": {
+        "storeName": { "type": "string" },
+        "storeTagline": { "type": "string" },
+        "address": { "type": "string" },
+        "phone": { "type": "string" },
+        "footerMessage": { "type": "string" },
+        "accentColor": { "type": "string" },
+        "headerFontSize": { "type": "number" },
+        "bodyFontSize": { "type": "number" },
+        "showSignature": { "type": "boolean" },
+        "tableTheme": { "type": "string", "enum": ["striped", "grid", "plain"] }
+      },
+      "required": ["storeName"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "User profile and role"
+    },
+    "/inventory/{itemId}": {
+      "schema": "InventoryItem",
+      "description": "Stock items"
+    },
+    "/bills/{billId}": {
+      "schema": "Bill",
+      "description": "Service bills"
+    },
+    "/suppliers/{supplierId}": {
+      "schema": "Supplier",
+      "description": "Suppliers information"
+    },
+    "/purchases/{purchaseId}": {
+      "schema": "Purchase",
+      "description": "Inventory purchases"
+    },
+    "/expenses/{expenseId}": {
+      "schema": "Expense",
+      "description": "Shop expenses"
+    },
+    "/customers/{customerId}": {
+      "schema": "Customer",
+      "description": "Customer and bike database"
+    },
+    "/jobCards/{cardId}": {
+      "schema": "JobCard",
+      "description": "Work in progress job cards"
+    },
+    "/settings/invoice": {
+      "schema": "InvoiceSettings",
+      "description": "Global invoice customization"
+    }
+  }
+}
